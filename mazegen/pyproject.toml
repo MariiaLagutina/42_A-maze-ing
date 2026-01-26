@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61", "wheel>=0.36"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen-42"
+version = "1.0.0"
+description = "Core maze generation library for A-Maze-Ing project"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name="Jayesh Manani", intra="jmanani" },
+  { name="Mariia Lagutina", intra="mlagutin" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+
+[tool.setuptools]
+packages = ["mazegen"]
+
+[tool.setuptools.package-data]
+mazegen = ["py.typed"]
