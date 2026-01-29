@@ -13,7 +13,11 @@ class ASCIIMazeRenderer:
     def __init__(self, maze: MazeGenerator):
         self.maze = maze
 
-    def render(self, walk: Iterable[Tuple[int, int]] | None = None):
+    def render(self, walk: Iterable[Tuple[int, int]] | None = None,
+               visited=None,
+               frontier=None,
+               current=None,
+               path=None):
         clear()
         m = self.maze
         walk = set(walk) if walk else set()
@@ -42,6 +46,14 @@ class ASCIIMazeRenderer:
                     row += " E "
                 elif (x, y) in walk:
                     row += " * "
+                elif path and (x, y) in path:
+                    row += " o "
+                elif current == (x, y):
+                    row += " @ "
+                elif frontier and (x, y) in frontier:
+                    row += " ? "
+                elif visited and (x, y) in visited:
+                    row += " . "
                 else:
                     row += "   "
 
@@ -54,3 +66,7 @@ class ASCIIMazeRenderer:
             for x in range(m.width):
                 row += "---+" if (m.grid[y][x] & SOUTH) else "   +"
             print(row)
+
+
+def rest():
+    print("rest")
