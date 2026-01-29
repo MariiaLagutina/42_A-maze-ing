@@ -2,6 +2,7 @@ import random
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Set
 from collections import deque
+import time
 
 # Constants for bitwise wall representation
 NORTH = 0b0001  # 1
@@ -54,6 +55,8 @@ class MazeGenerator(ABC):
 
         # Permanently blocked cells (the "42" pattern)
         self.blocked: Set[Tuple[int, int]] = set()
+        self.solution_path: Optional[str] = None
+        self.solution_cells: Optional[Set[Tuple[int, int]]] = None
 
     def _draw_42(self) -> None:
         """
@@ -154,7 +157,7 @@ class MazeGenerator(ABC):
                     nx, ny = random.choice(candidates)
                     self._remove_wall(x, y, nx, ny)
 
-    def solve(self) -> str:
+    def solve(self, renderer=None, delay: float = 0.05, show_path: bool = True) -> str:
         """
         Solves the maze using BFS to find the shortest valid path.
         """
@@ -170,8 +173,19 @@ class MazeGenerator(ABC):
 
         while queue:
             cx, cy, path = queue.popleft()
+            current = (cx, cy)
+            if renderer and show_path:
+                renderer.render(visited=visited, frontier=[
+                                (x, y, "") for x, y, _ in queue],
+                                current=(cx, cy))
+                time.sleep(delay)
 
-            if (cx, cy) == self.end:
+            if current == self.end:
+                self.solution_path = path
+                self.solution_cells = self._path_to_cells(path)
+                if renderer and show_path:
+                    renderer.render(path=self.solution_cells)
+                    time.sleep(0.1)
                 return path
 
             for direction, dx, dy, char in moves:
@@ -189,7 +203,27 @@ class MazeGenerator(ABC):
                 visited.add((nx, ny))
                 queue.append((nx, ny, path + char))
 
+        self.solution_path = None
+        self.solution_cells = None
         return ""
+
+    def _path_to_cells(self, path: str) -> Set[Tuple[int, int]]:
+        """
+        Converts BFS path string like 'NSEW' into set of coordinates.
+        """
+        x, y = self.start
+        cells = {(x, y)}
+        for move in path:
+            if move == 'N':
+                y -= 1
+            elif move == 'S':
+                y += 1
+            elif move == 'E':
+                x += 1
+            elif move == 'W':
+                x -= 1
+            cells.add((x, y))
+        return cells
 
     @abstractmethod
     def generate(self) -> None:

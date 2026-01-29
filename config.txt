@@ -20,7 +20,7 @@ EXIT = 19,19
 # Options:
 #   - backtracker  (Recursive Backtracker / DFS)
 #   - wilson       (Wilson's Algorithm)
-ALGO = wilson
+ALGO = backtracker
 
 # Perfect maze flag
 # true  -> perfect maze (no loops)

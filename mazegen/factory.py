@@ -11,26 +11,28 @@ _GENERATORS: Dict[str, Type[MazeGenerator]] = {
 }
 
 
-def get_maze_generator(
-    algorithm: str,
-    width: int,
-    height: int,
-    seed: Optional[int] = None
-) -> MazeGenerator:
-    """
-    Factory function to return the correct maze generator instance.
+class MazeFactory:
+    @staticmethod
+    def get_maze_generator(
+        algorithm: str,
+        width: int,
+        height: int,
+        seed: Optional[int] = None
+    ) -> MazeGenerator:
+        """
+        Factory function to return the correct maze generator instance.
 
-    Args:
-        algorithm: Name of the algorithm ('backtracker' or 'wilson').
-        width: Maze width.
-        height: Maze height.
-        seed: Random seed for reproducibility.
-    """
-    algorithm = algorithm.lower().strip()
+        Args:
+            algorithm: Name of the algorithm ('backtracker' or 'wilson').
+            width: Maze width.
+            height: Maze height.
+            seed: Random seed for reproducibility.
+        """
+        algorithm = algorithm.lower().strip()
 
-    try:
-        generator_cls = _GENERATORS[algorithm]
-    except KeyError:
-        raise ValueError(f"Unknown algorithm: {algorithm}")
+        try:
+            generator_cls = _GENERATORS[algorithm]
+        except KeyError:
+            raise ValueError(f"Unknown algorithm: {algorithm}")
 
-    return generator_cls(width, height, seed)
+        return generator_cls(width, height, seed)
