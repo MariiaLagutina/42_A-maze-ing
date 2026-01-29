@@ -12,7 +12,7 @@ class WilsonGenerator(MazeGenerator):
     have exactly the same probability of being generated.
     """
 
-    def generate(self) -> None:
+    def generate(self, delay: float = 0.02) -> None:
         self._draw_42()
         self.renderer = ASCIIMazeRenderer(self)
         # Cells already in the maze
@@ -64,7 +64,7 @@ class WilsonGenerator(MazeGenerator):
                 else:
                     walk.append(next_cell)
                 self.renderer.render(walk)
-                time.sleep(0.001)
+                time.sleep(delay)
                 current = next_cell
 
             # Carve the loop-erased path into the maze
@@ -77,4 +77,4 @@ class WilsonGenerator(MazeGenerator):
                 visited.add((x1, y1))
                 unvisited.remove((x1, y1))
                 self.renderer.render()
-                time.sleep(0.001)
+                time.sleep(delay)

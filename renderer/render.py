@@ -19,7 +19,7 @@ class ASCIIMazeRenderer:
     FRONTIER = " ? "
     CURRENT = " @ "
     WALK = " * "
-    PATH = " o "
+    PATH = " 0 "
 
     def __init__(self, maze: MazeGenerator,
                  wall_color: str = "magenta",
@@ -85,7 +85,8 @@ class ASCIIMazeRenderer:
                 elif (x, y) in walk:
                     row += colored(self.WALK, self.path_color, self.background)
                 elif path and (x, y) in path:
-                    row += colored(self.PATH, self.path_color, self.background)
+                    symbol = self.PATH
+                    row += colored(symbol, self.path_color, self.background)
                 elif current == (x, y):
                     row += colored(self.CURRENT,
                                    self.current_color, self.background)
@@ -100,7 +101,8 @@ class ASCIIMazeRenderer:
 
             # East wall of last cell
             row += colored("|", self.wall_color,
-                           self.background) if (m.grid[y][m.width - 1] & EAST) else " "
+                           self.background) if (
+                               m.grid[y][m.width - 1] & EAST) else " "
             print(row)
 
             # South walls

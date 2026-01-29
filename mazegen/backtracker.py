@@ -11,7 +11,7 @@ class BacktrackerGenerator(MazeGenerator):
     (iterative depth-first search).
     """
 
-    def generate(self) -> None:
+    def generate(self, delay: float = 0.02) -> None:
         self._draw_42()
         self.renderer = ASCIIMazeRenderer(self)
 
@@ -53,9 +53,9 @@ class BacktrackerGenerator(MazeGenerator):
                 visited.add((nx, ny))
                 stack.append((nx, ny))
                 self.renderer.render()
-                time.sleep(0.05)
+                time.sleep(delay)
             else:
                 # Backtrack
                 stack.pop()
                 self.renderer.render()
-                time.sleep(0.05)
+                time.sleep(delay)
