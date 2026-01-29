@@ -1,6 +1,8 @@
 import random
 from typing import List, Tuple, Set
-from .generator import MazeGenerator
+from mazegen.generator import MazeGenerator
+from renderer.render import ASCIIMazeRenderer
+import time
 
 
 class BacktrackerGenerator(MazeGenerator):
@@ -11,6 +13,7 @@ class BacktrackerGenerator(MazeGenerator):
 
     def generate(self) -> None:
         self._draw_42()
+        self.renderer = ASCIIMazeRenderer(self)
 
         stack: List[Tuple[int, int]] = []
         visited: Set[Tuple[int, int]] = set()
@@ -34,7 +37,6 @@ class BacktrackerGenerator(MazeGenerator):
         while stack:
             cx, cy = stack[-1]
             unvisited_neighbors: List[Tuple[int, int]] = []
-
             for dx, dy in moves:
                 nx, ny = cx + dx, cy + dy
 
@@ -50,6 +52,10 @@ class BacktrackerGenerator(MazeGenerator):
 
                 visited.add((nx, ny))
                 stack.append((nx, ny))
+                self.renderer.render()
+                time.sleep(0.05)
             else:
                 # Backtrack
                 stack.pop()
+                self.renderer.render()
+                time.sleep(0.05)

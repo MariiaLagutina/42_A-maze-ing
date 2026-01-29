@@ -1,6 +1,8 @@
 import random
 from typing import List, Tuple, Set
-from .generator import MazeGenerator
+from mazegen.generator import MazeGenerator
+import time
+from renderer.render import ASCIIMazeRenderer
 
 
 class WilsonGenerator(MazeGenerator):
@@ -12,7 +14,7 @@ class WilsonGenerator(MazeGenerator):
 
     def generate(self) -> None:
         self._draw_42()
-
+        self.renderer = ASCIIMazeRenderer(self)
         # Cells already in the maze
         visited: Set[Tuple[int, int]] = set()
         visited.update(self.blocked)
@@ -34,7 +36,6 @@ class WilsonGenerator(MazeGenerator):
         visited.add(first_cell)
 
         moves = [(0, -1), (0, 1), (1, 0), (-1, 0)]
-
         # Main Wilson loop
         while unvisited:
             start = random.choice(unvisited)
@@ -45,7 +46,6 @@ class WilsonGenerator(MazeGenerator):
 
             while current not in visited:
                 neighbors: List[Tuple[int, int]] = []
-
                 for dx, dy in moves:
                     nx, ny = current[0] + dx, current[1] + dy
                     if (
@@ -63,7 +63,8 @@ class WilsonGenerator(MazeGenerator):
                     walk = walk[:idx + 1]
                 else:
                     walk.append(next_cell)
-
+                self.renderer.render(walk)
+                time.sleep(0.001)
                 current = next_cell
 
             # Carve the loop-erased path into the maze
@@ -75,3 +76,5 @@ class WilsonGenerator(MazeGenerator):
 
                 visited.add((x1, y1))
                 unvisited.remove((x1, y1))
+                self.renderer.render()
+                time.sleep(0.001)
