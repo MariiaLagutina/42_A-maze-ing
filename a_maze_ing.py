@@ -1,8 +1,10 @@
 import sys
 import os
 from typing import Optional
-
-from mazegen import get_maze_generator, MazeGenerator
+import time
+from mazegen import MazeFactory, MazeGenerator
+from renderer import ASCIIMazeRenderer, clear
+import readchar
 
 
 def parse_config(file_path: str) -> dict[str, str]:
@@ -12,20 +14,21 @@ def parse_config(file_path: str) -> dict[str, str]:
     Lines starting with '#' or empty lines are ignored.
     """
     config: dict[str, str] = {}
+    try:
+        with open(file_path, "r") as f:
+            for line in f:
+                line = line.strip()
 
-    with open(file_path, "r") as f:
-        for line in f:
-            line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
 
-            if not line or line.startswith("#"):
-                continue
+                if "=" not in line:
+                    continue
 
-            if "=" not in line:
-                continue
-
-            key, value = line.split("=", 1)
-            config[key.strip().upper()] = value.strip()
-
+                key, value = line.split("=", 1)
+                config[key.strip().upper()] = value.strip()
+    except Exception as e:
+        print(f"Error While Config Parsing - {type(e).__name__} - {e}")
     return config
 
 
@@ -57,6 +60,29 @@ def save_maze_to_file(
         f.write(f"{generator.start[0]},{generator.start[1]}\n")
         f.write(f"{generator.end[0]},{generator.end[1]}\n")
         f.write(solution + "\n")
+
+
+def gen_new_maze(algorithm: str, width: int,
+                 height: int, seed: Optional[int],
+                 entry: tuple[int, int],
+                 exit_: tuple[int, int],
+                 perfect: bool) -> MazeGenerator:
+    try:
+        maze = MazeFactory.get_maze_generator(
+            algorithm=algorithm,
+            width=width,
+            height=height,
+            seed=seed
+        )
+        maze.start = entry
+        maze.end = exit_
+        maze.generate()
+        if not perfect:
+            maze.make_imperfect()
+        return maze
+    except Exception as e:
+        print(f"Error: {e}")
+        raise Exception("Failed to create maze generator.")
 
 
 def main() -> None:
@@ -105,36 +131,78 @@ def main() -> None:
 
     print(f"Initializing {algorithm.upper()} generator ({width}x{height})")
 
-    try:
-        generator = get_maze_generator(
-            algorithm=algorithm,
-            width=width,
-            height=height,
-            seed=seed,
+    wall_color: str = "magenta"
+    blocked_color: str = "red"
+    path_color: str = "yellow"
+    visited_color: str = "cyan"
+    frontier_color: str = "blue"
+    current_color: str = "red"
+
+    path_visible = True
+    delay = 0.05
+    maze = gen_new_maze(
+        algorithm=algorithm,
+        width=width,
+        height=height,
+        seed=seed,
+        entry=entry,
+        exit_=exit_,
+        perfect=perfect)
+    regen = False
+    while True:
+        if regen:
+            maze = gen_new_maze(
+                algorithm=algorithm,
+                width=width,
+                height=height,
+                seed=seed,
+                entry=entry,
+                exit_=exit_,
+                perfect=perfect
+            )
+            regen = False
+        # Apply entry / exit from config
+
+        renderer = ASCIIMazeRenderer(
+            maze,
+            wall_color=wall_color,
+            start_color="green",
+            end_color="red",
+            path_color=path_color,
+            visited_color=visited_color,
+            frontier_color=frontier_color,
+            current_color=current_color,
+            blocked_color=blocked_color
         )
-    except ValueError as e:
-        print(f"Error: {e}")
-        return
+        path = maze.solve(renderer=renderer, delay=delay,
+                          show_path=path_visible)
+        print(
+            "\nCommands: [SPACE] regenerate | [P] toggle path | [C] change colors | [Q] quit")
+        key = readchar.readchar().lower()
 
-    # Apply entry / exit from config
-    generator.start = entry
-    generator.end = exit_
+        if key == "q":
+            break
+        elif key == " ":
+            regen = True
+            continue  # regenerate
+        elif key == "p":
+            path_visible = not path_visible
+        elif key == "c":
+            # Change wall color
+            print("\nAvailable colors: red, green, yellow, blue, magenta, cyan, white")
+            c = input("Wall color: ").strip().lower()
+            if c:
+                wall_color = c
+            c = input("42 pattern color: ").strip().lower()
+            if c:
+                blocked_color = c
 
-    # Generation pipeline
-    generator.generate()
-
-    if not perfect:
-        print("Creating imperfect maze (adding cycles)...")
-        generator.make_imperfect()
-
-    print("Solving maze...")
-    solution = generator.solve()
-
+    # Save maze on exit
     try:
-        save_maze_to_file(generator, output_file, solution)
-        print(f"Maze successfully saved to '{output_file}'")
-    except OSError as e:
-        print(f"Error writing output file: {e}")
+        save_maze_to_file(maze, output_file, "".join(path))
+        print(f"Maze saved to '{output_file}'")
+    except Exception as e:
+        print(f"Error saving maze: {e}")
 
 
 if __name__ == "__main__":

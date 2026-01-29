@@ -1,4 +1,4 @@
-from .factory import get_maze_generator
-from .generator import MazeGenerator
+from mazegen.factory import MazeFactory
+from mazegen.generator import MazeGenerator
 
-__all__ = ["get_maze_generator", "MazeGenerator"]
+__all__ = ["MazeFactory", "MazeGenerator"]
