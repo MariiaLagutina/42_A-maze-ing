@@ -157,7 +157,8 @@ class MazeGenerator(ABC):
                     nx, ny = random.choice(candidates)
                     self._remove_wall(x, y, nx, ny)
 
-    def solve(self, renderer=None, delay: float = 0.05, show_path: bool = True) -> str:
+    def solve(self, renderer=None, delay: float = 0.02,
+              show_path: bool = True) -> str:
         """
         Solves the maze using BFS to find the shortest valid path.
         """
@@ -174,18 +175,26 @@ class MazeGenerator(ABC):
         while queue:
             cx, cy, path = queue.popleft()
             current = (cx, cy)
-            if renderer and show_path:
-                renderer.render(visited=visited, frontier=[
-                                (x, y, "") for x, y, _ in queue],
-                                current=(cx, cy))
+            if renderer:
+                # renderer.render(visited=visited, frontier=[
+                #                 (x, y, "") for x, y, _ in queue],
+                #                 current=(cx, cy))
+                renderer.render(
+                    visited=visited,
+                    frontier=[(x, y, "") for x, y, _ in queue],
+                    current=(cx, cy),
+                    # path=self.solution_cells if show_path else None
+                )
                 time.sleep(delay)
 
             if current == self.end:
                 self.solution_path = path
                 self.solution_cells = self._path_to_cells(path)
-                if renderer and show_path:
-                    renderer.render(path=self.solution_cells)
-                    time.sleep(0.1)
+                if renderer:
+                    # renderer.render(path=self.solution_cells)
+                    renderer.render(path=self.solution_cells if
+                                    show_path else None)
+                    time.sleep(delay)
                 return path
 
             for direction, dx, dy, char in moves:

@@ -150,6 +150,7 @@ def main() -> None:
         perfect=perfect)
     regen = False
     while True:
+        clear()
         if regen:
             maze = gen_new_maze(
                 algorithm=algorithm,
@@ -162,7 +163,6 @@ def main() -> None:
             )
             regen = False
         # Apply entry / exit from config
-
         renderer = ASCIIMazeRenderer(
             maze,
             wall_color=wall_color,
@@ -177,14 +177,14 @@ def main() -> None:
         path = maze.solve(renderer=renderer, delay=delay,
                           show_path=path_visible)
         print(
-            "\nCommands: [SPACE] regenerate | [P] toggle path | [C] change colors | [Q] quit")
+            str("\nCommands: [SPACE] regenerate |"
+                " [P] toggle path | [C] change colors | [Q] quit"))
         key = readchar.readchar().lower()
 
         if key == "q":
             break
         elif key == " ":
-            regen = True
-            continue  # regenerate
+            regen = True  # regenerate
         elif key == "p":
             path_visible = not path_visible
         elif key == "c":
