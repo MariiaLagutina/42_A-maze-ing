@@ -19,10 +19,6 @@ OPPOSITE = {
     WEST: EAST
 }
 
-# Minimal size required to draw the "42" pattern safely
-MIN_WIDTH_FOR_42 = 12
-MIN_HEIGHT_FOR_42 = 10
-
 
 class MazeGenerator(ABC):
     """
@@ -58,12 +54,23 @@ class MazeGenerator(ABC):
         self.solution_path: Optional[str] = None
         self.solution_cells: Optional[List[Tuple[int, int]]] = None
 
+        # Minimal size required to draw the "42" pattern safely
+        self.min_width_42 = 12
+        self.min_height_42 = 10
+        # Possible movement directions (dx, dy)
+        self.possible_moves = [
+            (0, -1),  # North
+            (0, 1),   # South
+            (1, 0),   # East
+            (-1, 0)   # West
+        ]
+
     def _draw_42(self) -> None:
         """
         Draws the '42' pattern centered in the grid by adding coordinates
         to the blocked set. Blocked cells remain fully closed.
         """
-        if self.width < MIN_WIDTH_FOR_42 or self.height < MIN_HEIGHT_FOR_42:
+        if self.width < self.min_width_42 or self.height < self.min_height_42:
             print("Error: Maze too small for '42' pattern.")
             return
 

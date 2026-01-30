@@ -35,7 +35,6 @@ class WilsonGenerator(MazeGenerator):
         unvisited.remove(first_cell)
         visited.add(first_cell)
 
-        moves = [(0, -1), (0, 1), (1, 0), (-1, 0)]
         # Main Wilson loop
         while unvisited:
             start = random.choice(unvisited)
@@ -46,7 +45,7 @@ class WilsonGenerator(MazeGenerator):
 
             while current not in visited:
                 neighbors: List[Tuple[int, int]] = []
-                for dx, dy in moves:
+                for dx, dy in self.possible_moves:
                     nx, ny = current[0] + dx, current[1] + dy
                     if (
                         0 <= nx < self.width
