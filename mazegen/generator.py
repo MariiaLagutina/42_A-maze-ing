@@ -55,10 +55,10 @@ class MazeGenerator(ABC):
         self.solution_cells: Optional[List[Tuple[int, int]]] = None
 
         # Minimal size required to draw the "42" pattern safely
-        self.min_width_42 = 12
-        self.min_height_42 = 10
+        self.min_width_42: int = 12
+        self.min_height_42: int = 10
         # Possible movement directions (dx, dy)
-        self.possible_moves = [
+        self.possible_moves: List[Tuple[int, int]] = [
             (0, -1),  # North
             (0, 1),   # South
             (1, 0),   # East

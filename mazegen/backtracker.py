@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Optional
 from .generator import MazeGenerator
 from renderer.render import ASCIIMazeRenderer
 import time
@@ -11,9 +11,18 @@ class BacktrackerGenerator(MazeGenerator):
     (iterative depth-first search).
     """
 
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        seed: Optional[int] = None
+    ) -> None:
+        super().__init__(width, height, seed)
+        self.renderer: Optional[ASCIIMazeRenderer] = None
+
     def generate(self, delay: float = 0.02) -> None:
         self._draw_42()
-        self.renderer: ASCIIMazeRenderer = ASCIIMazeRenderer(self)
+        self.renderer = ASCIIMazeRenderer(self)
 
         stack: List[Tuple[int, int]] = []
         visited: Set[Tuple[int, int]] = set()
@@ -22,6 +31,12 @@ class BacktrackerGenerator(MazeGenerator):
         visited.update(self.blocked)
 
         # Start position
+        sx: int
+        sy: int
+        cx: int
+        cy: int
+        nx: int
+        ny: int
         sx, sy = self.start
         stack.append((sx, sy))
         visited.add((sx, sy))
