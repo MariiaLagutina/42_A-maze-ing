@@ -137,6 +137,7 @@ def main() -> None:
     visited_color: str = "cyan"
     frontier_color: str = "blue"
     current_color: str = "red"
+    background_color: Optional[str] = None
 
     path_visible = True
     delay = 0.05
@@ -163,6 +164,9 @@ def main() -> None:
             )
             regen = False
         # Apply entry / exit from config
+        # Convert background color to termcolor format (on_<color>)
+        bg = f"on_{background_color}" if background_color else None
+
         renderer = ASCIIMazeRenderer(
             maze,
             wall_color=wall_color,
@@ -172,9 +176,16 @@ def main() -> None:
             visited_color=visited_color,
             frontier_color=frontier_color,
             current_color=current_color,
-            blocked_color=blocked_color
+            blocked_color=blocked_color,
+            background=bg
         )
-        path = maze.solve(renderer=renderer, delay=delay,
+
+        # Show the maze first
+        renderer.render()
+
+        # Solve and animate path only if path_visible is True
+        path = maze.solve(renderer=renderer if path_visible else None,
+                          delay=delay,
                           show_path=path_visible)
         print(
             str("\nCommands: [SPACE] regenerate |"
@@ -188,14 +199,26 @@ def main() -> None:
         elif key == "p":
             path_visible = not path_visible
         elif key == "c":
-            # Change wall color
-            print("\nAvailable colors: red, green, yellow, blue, magenta, cyan, white")
-            c = input("Wall color: ").strip().lower()
+            # Change colors
+            print("\nAvailable colors: red, green, yellow,\
+                   blue, magenta, cyan, white")
+            print("(Leave empty to keep current color)\n")
+
+            c = input("Wall color: ")
             if c:
+                c = c.strip().lower()
                 wall_color = c
-            c = input("42 pattern color: ").strip().lower()
+
+            c = input("42 pattern color: ")
             if c:
+                c = c.strip().lower()
                 blocked_color = c
+
+            c = input(
+                "Background color (or 'none' for no background): ")
+            if c:
+                c = c.strip().lower()
+                background_color = None if c == "none" else c
 
     # Save maze on exit
     try:

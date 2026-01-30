@@ -183,7 +183,7 @@ class MazeGenerator(ABC):
                 # Animate the solution path when found
                 if renderer and show_path:
                     renderer.render_path_animated(
-                        path=self.solution_cells,
+                        walked_path=self.solution_cells,
                         delay=delay,
                         visited=visited
                     )
