@@ -1,5 +1,5 @@
 import os
-from typing import Iterable, Tuple, Optional
+from typing import Iterable, Tuple, Optional, Dict, Any, List, Set
 from termcolor import colored
 from mazegen.generator import MazeGenerator, NORTH, SOUTH, EAST, WEST
 import time
@@ -45,7 +45,7 @@ class ASCIIMazeRenderer:
         self.frontier_color = frontier_color
         self.current_color = current_color
         self.blocked_color = blocked_color
-        self.background = background
+        self.bg = background
 
     def render(self,
                walk: Optional[Iterable[Tuple[int, int]]] = None,
@@ -54,7 +54,7 @@ class ASCIIMazeRenderer:
                current: Optional[Tuple[int, int]] = None,
                walked_path: Optional[Iterable[Tuple[int, int]]] = None,
                arrow: Optional[str] = None,
-               path_directions: Optional[dict] = None):
+               path_directions: Optional[Dict[Any, Any]] = {}):
         walk = set(walk or [])
         visited = set(visited or [])
         frontier = set(frontier or [])
@@ -68,11 +68,11 @@ class ASCIIMazeRenderer:
         for x in range(m.width):
             if (m.grid[0][x] & NORTH):
                 line += colored("---+", self.wall_color,
-                                on_color=self.background)
+                                on_color=self.bg)
             else:
                 line += colored("   +", None,
-                                on_color=self.background
-                                ) if self.background else "   +"
+                                on_color=self.bg
+                                ) if self.bg else "   +"
         print(line)
 
         for y in range(m.height):
@@ -83,87 +83,86 @@ class ASCIIMazeRenderer:
                 # West wall
                 if (cell & WEST):
                     row += colored("|", self.wall_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 else:
                     row += colored(" ", None,
-                                   on_color=self.background
-                                   ) if self.background else " "
-
+                                   on_color=self.bg
+                                   ) if self.bg else " "
                 # Cell content
                 if (x, y) in m.blocked:
                     row += colored(self.BLOCKED,
                                    self.blocked_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif (x, y) == m.start:
                     row += colored(self.START, self.start_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif (x, y) == m.end:
                     row += colored(self.END, self.end_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif (x, y) in walk:
                     row += colored(self.WALK, self.path_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif current == (x, y) and arrow:
                     # Show arrow pointing to next direction
                     row += colored(arrow, self.current_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif current == (x, y):
                     row += colored(self.CURRENT,
                                    self.current_color,
-                                   on_color=self.background)
-                elif walked_path and (x, y) in walked_path and (x, y) in path_directions:
+                                   on_color=self.bg)
+                elif walked_path and (x, y) in walked_path\
+                        and (x, y) in path_directions:
                     # Show directional arrow for entire path
                     symbol = path_directions[(x, y)]
                     row += colored(symbol, self.path_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif walked_path and (x, y) in walked_path:
                     symbol = self.PATH_MARKING
                     row += colored(symbol, self.path_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif frontier and (x, y) in frontier:
                     row += colored(self.FRONTIER,
                                    self.frontier_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 elif visited and (x, y) in visited:
                     row += colored(self.VISITED,
                                    self.visited_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 else:
                     row += colored("   ", None,
-                                   on_color=self.background
-                                   ) if self.background else "   "
+                                   on_color=self.bg
+                                   ) if self.bg else "   "
 
             # East wall of last cell
             if (m.grid[y][m.width - 1] & EAST):
-                row += colored("|", self.wall_color, on_color=self.background)
+                row += colored("|", self.wall_color, on_color=self.bg)
             else:
                 row += colored(" ", None,
-                               on_color=self.background
-                               ) if self.background else " "
+                               on_color=self.bg
+                               ) if self.bg else " "
             print(row)
 
             # South walls
             row = colored(
-                "+", None, on_color=self.background
-            ) if self.background else "+"
+                "+", None, on_color=self.bg
+            ) if self.bg else "+"
             for x in range(m.width):
                 if (m.grid[y][x] & SOUTH):
                     row += colored("---+", self.wall_color,
-                                   on_color=self.background)
+                                   on_color=self.bg)
                 else:
                     row += colored("   +", None,
-                                   on_color=self.background
-                                   ) if self.background else "   +"
+                                   on_color=self.bg
+                                   ) if self.bg else "   +"
             print(row)
 
     def render_path_animated(self,
                              walked_path: Iterable[Tuple[int, int]],
                              delay: float = 0.1,
                              walk: Optional[Iterable[Tuple[int, int]]] = None,
-                             visited: Optional[Iterable[Tuple[int, int]
-                                                        ]] = None):
-        """Render path step by step with animation showing arrow trail from start to end."""
-        path_list = list(walked_path)
+                             visited: Optional[Iterable[Tuple[int, int]]
+                                               ] = None):
+        path_list: List[Tuple[int, int]] = list(walked_path)
         walk = set(walk or [])
         visited = set(visited or [])
 
@@ -172,11 +171,10 @@ class ASCIIMazeRenderer:
             current_pos = path_list[i-1] if i > 0 else None
 
             # Build directional arrows for entire path
-            path_directions = {}
+            path_directions: Dict[Tuple[int, int], str] = {}
             for idx in range(len(current_path) - 1):
-                pos = current_path[idx]
-                next_pos = current_path[idx + 1]
-
+                pos: Tuple[int, int] = current_path[idx]
+                next_pos: Tuple[int, int] = current_path[idx + 1]
                 dx = next_pos[0] - pos[0]
                 dy = next_pos[1] - pos[1]
 
@@ -190,10 +188,9 @@ class ASCIIMazeRenderer:
                     path_directions[pos] = self.ARROW_RIGHT
 
             # Determine direction and build arrow trail for current position
-            next_pos = path_list[i] if i < len(path_list) else None
-            arrow = None
+            next_pos = path_list[i] if i < len(path_list) else (-1, -1)
 
-            if current_pos and next_pos:
+            if current_pos and next_pos and next_pos != (-1, -1):
                 dx = next_pos[0] - current_pos[0]
                 dy = next_pos[1] - current_pos[1]
 
@@ -206,24 +203,11 @@ class ASCIIMazeRenderer:
                         trail_length += 1
                     else:
                         break
-
-                if dy < 0:  # Moving up
-                    arrow = " ↑ " + ("│" * (trail_length - 1)
-                                     )[-1:] if trail_length > 1 else " ↑ "
-                elif dy > 0:  # Moving down
-                    arrow = " ↓ " + ("│" * (trail_length - 1)
-                                     )[-1:] if trail_length > 1 else " ↓ "
-                elif dx < 0:  # Moving left
-                    arrow = "←" + "─" * min(trail_length - 1, 1)
-                elif dx > 0:  # Moving right
-                    arrow = "→" + "─" * min(trail_length - 1, 1)
-
             self.render(
                 walk=walk,
                 visited=visited,
                 current=current_pos,
                 walked_path=current_path,
-                arrow=arrow,
                 path_directions=path_directions
             )
 

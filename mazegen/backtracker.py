@@ -13,7 +13,7 @@ class BacktrackerGenerator(MazeGenerator):
 
     def generate(self, delay: float = 0.02) -> None:
         self._draw_42()
-        self.renderer = ASCIIMazeRenderer(self)
+        self.renderer: ASCIIMazeRenderer = ASCIIMazeRenderer(self)
 
         stack: List[Tuple[int, int]] = []
         visited: Set[Tuple[int, int]] = set()
@@ -52,10 +52,8 @@ class BacktrackerGenerator(MazeGenerator):
 
                 visited.add((nx, ny))
                 stack.append((nx, ny))
-                self.renderer.render()
-                time.sleep(delay)
             else:
                 # Backtrack
                 stack.pop()
-                self.renderer.render()
-                time.sleep(delay)
+            self.renderer.render()
+            time.sleep(delay)

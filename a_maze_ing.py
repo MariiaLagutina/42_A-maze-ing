@@ -139,6 +139,7 @@ def main() -> None:
     background_color: Optional[str] = None
 
     path_visible = True
+    regen = False
     delay = 0.05
     maze = gen_new_maze(
         algorithm=algorithm,
@@ -148,7 +149,6 @@ def main() -> None:
         entry=entry,
         exit_=exit_,
         perfect=perfect)
-    regen = False
     while True:
         clear()
         if regen:
