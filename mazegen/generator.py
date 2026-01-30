@@ -56,7 +56,7 @@ class MazeGenerator(ABC):
         # Permanently blocked cells (the "42" pattern)
         self.blocked: Set[Tuple[int, int]] = set()
         self.solution_path: Optional[str] = None
-        self.solution_cells: Optional[Set[Tuple[int, int]]] = None
+        self.solution_cells: Optional[List[Tuple[int, int]]] = None
 
     def _draw_42(self) -> None:
         """
@@ -112,7 +112,7 @@ class MazeGenerator(ABC):
         self.grid[y1][x1] &= ~direction
         self.grid[y2][x2] &= ~OPPOSITE[direction]
 
-    def make_imperfect(self, threshold: float = 0.05) -> None:
+    def make_imperfect(self, threshold: float = 0.005) -> None:
         """
         Removes random internal walls to create loops (cycles) in the maze.
         This turns a Perfect Maze into an Imperfect Maze.
@@ -157,7 +157,7 @@ class MazeGenerator(ABC):
                     nx, ny = random.choice(candidates)
                     self._remove_wall(x, y, nx, ny)
 
-    def solve(self, renderer=None, delay: float = 0.02,
+    def solve(self, renderer=None, delay: float = 0.5,
               show_path: bool = True) -> str:
         """
         Solves the maze using BFS to find the shortest valid path.
@@ -175,26 +175,18 @@ class MazeGenerator(ABC):
         while queue:
             cx, cy, path = queue.popleft()
             current = (cx, cy)
-            if renderer:
-                # renderer.render(visited=visited, frontier=[
-                #                 (x, y, "") for x, y, _ in queue],
-                #                 current=(cx, cy))
-                renderer.render(
-                    visited=visited,
-                    frontier=[(x, y, "") for x, y, _ in queue],
-                    current=(cx, cy),
-                    # path=self.solution_cells if show_path else None
-                )
-                time.sleep(delay)
 
             if current == self.end:
                 self.solution_path = path
                 self.solution_cells = self._path_to_cells(path)
-                if renderer:
-                    # renderer.render(path=self.solution_cells)
-                    renderer.render(path=self.solution_cells if
-                                    show_path else None)
-                    time.sleep(delay)
+
+                # Animate the solution path when found
+                if renderer and show_path:
+                    renderer.render_path_animated(
+                        path=self.solution_cells,
+                        delay=delay,
+                        visited=visited
+                    )
                 return path
 
             for direction, dx, dy, char in moves:
@@ -216,12 +208,12 @@ class MazeGenerator(ABC):
         self.solution_cells = None
         return ""
 
-    def _path_to_cells(self, path: str) -> Set[Tuple[int, int]]:
+    def _path_to_cells(self, path: str) -> List[Tuple[int, int]]:
         """
-        Converts BFS path string like 'NSEW' into set of coordinates.
+        Converts BFS path string like 'NSEW' into ordered list of coordinates.
         """
         x, y = self.start
-        cells = {(x, y)}
+        cells = [(x, y)]
         for move in path:
             if move == 'N':
                 y -= 1
@@ -231,7 +223,7 @@ class MazeGenerator(ABC):
                 x += 1
             elif move == 'W':
                 x -= 1
-            cells.add((x, y))
+            cells.append((x, y))
         return cells
 
     @abstractmethod

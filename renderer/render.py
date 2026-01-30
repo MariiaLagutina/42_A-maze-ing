@@ -1,7 +1,9 @@
+from importlib.resources import path
 import os
 from typing import Iterable, Tuple, Optional
 from termcolor import colored
 from mazegen.generator import MazeGenerator, NORTH, SOUTH, EAST, WEST
+import time
 
 
 def clear():
@@ -19,7 +21,7 @@ class ASCIIMazeRenderer:
     FRONTIER = " ? "
     CURRENT = " @ "
     WALK = " * "
-    PATH = " 0 "
+    PATH_MARKING = " X "
 
     def __init__(self, maze: MazeGenerator,
                  wall_color: str = "magenta",
@@ -85,7 +87,7 @@ class ASCIIMazeRenderer:
                 elif (x, y) in walk:
                     row += colored(self.WALK, self.path_color, self.background)
                 elif path and (x, y) in path:
-                    symbol = self.PATH
+                    symbol = self.PATH_MARKING
                     row += colored(symbol, self.path_color, self.background)
                 elif current == (x, y):
                     row += colored(self.CURRENT,
@@ -109,5 +111,30 @@ class ASCIIMazeRenderer:
             row = "+"
             for x in range(m.width):
                 row += colored("---+", self.wall_color,
-                               self.background) if (m.grid[y][x] & SOUTH) else "   +"
+                               self.background
+                               ) if (m.grid[y][x] & SOUTH) else "   +"
             print(row)
+
+    def render_path_animated(self,
+                             path: Iterable[Tuple[int, int]],
+                             delay: float = 0.1,
+                             walk: Optional[Iterable[Tuple[int, int]]] = None,
+                             visited: Optional[Iterable[Tuple[int, int]]] = None):
+        """Render path step by step with animation."""
+        path_list = list(path)
+        walk = set(walk or [])
+        visited = set(visited or [])
+
+        for i in range(len(path_list) + 1):
+            current_path = path_list[:i]
+            current_pos = path_list[i-1] if i > 0 else None
+
+            self.render(
+                walk=walk,
+                visited=visited,
+                current=current_pos,
+                path=current_path
+            )
+
+            if i < len(path_list):
+                time.sleep(delay)
