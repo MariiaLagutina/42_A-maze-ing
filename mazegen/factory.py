@@ -27,13 +27,11 @@ class MazeFactory:
             height: Maze height.
             seed: Random seed for reproducibility.
         """
-        # Mapping between algorithm names and their generator classes
-
+        # Get generator class from enum by algorithm name
         algorithm = algorithm.lower().strip()
-
         try:
-            generator_cls = _GENERATORS[algorithm].value
-        except KeyError:
+            generator_cls = getattr(_GENERATORS, algorithm).value
+        except (KeyError, AttributeError):
             raise ValueError(f"Unknown algorithm: {algorithm}")
 
         return generator_cls(width, height, seed)
