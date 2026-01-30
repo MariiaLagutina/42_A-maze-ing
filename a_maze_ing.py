@@ -1,7 +1,6 @@
 import sys
 import os
 from typing import Optional
-import time
 from mazegen import MazeFactory, MazeGenerator
 from renderer import ASCIIMazeRenderer, clear
 import readchar
