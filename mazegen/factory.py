@@ -1,14 +1,13 @@
-from typing import Optional, Type, Dict
+from typing import Optional
 from .generator import MazeGenerator
 from .backtracker import BacktrackerGenerator
 from .wilson import WilsonGenerator
+from enum import Enum
 
 
-# Mapping between algorithm names and their generator classes
-_GENERATORS: Dict[str, Type[MazeGenerator]] = {
-    "backtracker": BacktrackerGenerator,
-    "wilson": WilsonGenerator,
-}
+class _GENERATORS(Enum):
+    backtracker = BacktrackerGenerator
+    wilson = WilsonGenerator
 
 
 class MazeFactory:
@@ -28,10 +27,12 @@ class MazeFactory:
             height: Maze height.
             seed: Random seed for reproducibility.
         """
+        # Mapping between algorithm names and their generator classes
+
         algorithm = algorithm.lower().strip()
 
         try:
-            generator_cls = _GENERATORS[algorithm]
+            generator_cls = _GENERATORS[algorithm].value
         except KeyError:
             raise ValueError(f"Unknown algorithm: {algorithm}")
 

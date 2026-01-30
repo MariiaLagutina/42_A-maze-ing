@@ -1,5 +1,5 @@
 import os
-from typing import Iterable, Tuple, Optional, Dict, Any, List, Set
+from typing import Iterable, Tuple, Optional, Dict, Any, List
 from termcolor import colored
 from mazegen.generator import MazeGenerator, NORTH, SOUTH, EAST, WEST
 import time
