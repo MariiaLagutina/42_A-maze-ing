@@ -8,19 +8,20 @@ version = "1.0.0"
 description = "Core maze generation library for A-Maze-Ing project"
 readme = "README.md"
 requires-python = ">=3.10"
+
 authors = [
-  { name="Jayesh Manani", intra="jmanani" },
-  { name="Mariia Lagutina", intra="mlagutin" },
+  { name = "Jayesh Manani (jmanani)" },
+  { name = "Mariia Lagutina (mlagutin)" }
 ]
+
+dependencies = []
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = []
 
-[tool.setuptools]
-packages = ["mazegen"]
-
-[tool.setuptools.package-data]
-mazegen = ["py.typed"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mazegen"]
