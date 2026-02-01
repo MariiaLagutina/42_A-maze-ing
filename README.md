@@ -242,10 +242,14 @@ The project was developed iteratively, starting with core maze validity and cons
 
 ## Use of AI
 
-AI tools were used responsibly to:
+Artificial Intelligence Integration Policy
 
-* review architecture and design patterns
-* validate Makefile and packaging configuration
-* improve documentation clarity
+To ensure high code quality, LLM-based tools were used for static analysis and refinement to:
 
-All generated suggestions were reviewed, understood, and adapted by the team.
+* analyze complex design patterns for edge-case coverage
+
+* validate deployment and packaging scripts
+
+* proofread technical documentation for professional terminology
+
+The team maintained full control over the codebase, reviewing and adapting all suggestions to meet specific project constraints.
