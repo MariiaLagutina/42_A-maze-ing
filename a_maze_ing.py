@@ -1,8 +1,9 @@
 import sys
 import os
 from typing import Optional
-from mazegen import MazeFactory, MazeGenerator
-from renderer import ASCIIMazeRenderer, clear
+from mazegen import MazeFactory, MazeGenerator, MazeRenderer
+from renderer import ASCIIMazeRenderer
+from utils import clear
 import readchar
 
 
@@ -66,7 +67,7 @@ def gen_new_maze(algorithm: str, width: int,
                  entry: tuple[int, int],
                  exit_: tuple[int, int],
                  perfect: bool,
-                 renderer: Optional[object] = None) -> MazeGenerator:
+                 renderer: Optional[MazeRenderer] = None) -> MazeGenerator:
     try:
         maze = MazeFactory.get_maze_generator(
             algorithm=algorithm,

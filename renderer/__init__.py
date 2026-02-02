@@ -1,3 +1,3 @@
-from renderer.render import ASCIIMazeRenderer, clear
+from renderer.render import ASCIIMazeRenderer
 
-__all__ = ["ASCIIMazeRenderer", "clear"]
+__all__ = ["ASCIIMazeRenderer"]

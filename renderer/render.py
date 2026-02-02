@@ -1,12 +1,8 @@
-import os
 from typing import Iterable, Tuple, Optional, Dict, Any, List
-from termcolor import colored
+from termcolor import colored  # type: ignore[import-not-found]
 from mazegen.generator import MazeGenerator, NORTH, SOUTH, EAST, WEST
+from utils import clear
 import time
-
-
-def clear():
-    os.system("clear" if os.name == "posix" else "cls")
 
 
 class ASCIIMazeRenderer:

@@ -1,6 +1,6 @@
 import random
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional, Set, Protocol, Iterable
+from typing import List, Tuple, Optional, Set, Protocol, Iterable, Dict, Any
 from collections import deque
 
 # Constants for bitwise wall representation
@@ -22,14 +22,24 @@ OPPOSITE = {
 class MazeRenderer(Protocol):
     """Renderer protocol used by maze generators (Strategy pattern)."""
 
-    def render(self, *args, **kwargs) -> None:
+    def render(
+        self,
+        walk: Optional[Iterable[Tuple[int, int]]] = None,
+        visited: Optional[Iterable[Tuple[int, int]]] = None,
+        frontier: Optional[Iterable[Tuple[int, int]]] = None,
+        current: Optional[Tuple[int, int]] = None,
+        walked_path: Optional[Iterable[Tuple[int, int]]] = None,
+        arrow: Optional[str] = None,
+        path_directions: Optional[Dict[Any, Any]] = None
+    ) -> None:
         ...
 
     def render_path_animated(self,
                              walked_path: Iterable[Tuple[int, int]],
                              delay: float = 0.1,
                              walk: Optional[Iterable[Tuple[int, int]]] = None,
-                             visited: Optional[Iterable[Tuple[int, int]]] = None
+                             visited: Optional[Iterable[Tuple[int, int]]]
+                             = None
                              ) -> None:
         ...
 
@@ -248,7 +258,8 @@ class MazeGenerator(ABC):
         return cells
 
     @abstractmethod
-    def generate(self, *args, **kwargs) -> None:
+    def generate(self, delay: float = 0.02,
+                 renderer: Optional[MazeRenderer] = None) -> None:
         """
         Child classes must implement the maze generation logic.
         """
