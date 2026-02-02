@@ -1,8 +1,7 @@
 import random
-from typing import List, Tuple, Set
-from mazegen.generator import MazeGenerator
+from typing import List, Tuple, Set, Optional
+from mazegen.generator import MazeGenerator, MazeRenderer
 import time
-from renderer.render import ASCIIMazeRenderer
 
 
 class WilsonGenerator(MazeGenerator):
@@ -12,9 +11,19 @@ class WilsonGenerator(MazeGenerator):
     have exactly the same probability of being generated.
     """
 
-    def generate(self, delay: float = 0.02) -> None:
+    def __init__(self,
+                 width: int,
+                 height: int,
+                 seed: Optional[int] = None,
+                 renderer: Optional[MazeRenderer] = None) -> None:
+        super().__init__(width, height, seed)
+        self.renderer: Optional[MazeRenderer] = renderer
+
+    def generate(self, delay: float = 0.02,
+                 renderer: Optional[MazeRenderer] = None) -> None:
         self._draw_42()
-        self.renderer = ASCIIMazeRenderer(self)
+        if renderer is not None:
+            self.renderer = renderer
         # Cells already in the maze
         visited: Set[Tuple[int, int]] = set()
         visited.update(self.blocked)
@@ -62,8 +71,9 @@ class WilsonGenerator(MazeGenerator):
                     walk = walk[:idx + 1]
                 else:
                     walk.append(next_cell)
-                self.renderer.render(walk)
-                time.sleep(delay)
+                if self.renderer is not None:
+                    self.renderer.render(walk)
+                    time.sleep(delay)
                 current = next_cell
 
             # Carve the loop-erased path into the maze
@@ -75,5 +85,6 @@ class WilsonGenerator(MazeGenerator):
 
                 visited.add((x1, y1))
                 unvisited.remove((x1, y1))
-                self.renderer.render()
-                time.sleep(delay)
+                if self.renderer is not None:
+                    self.renderer.render()
+                    time.sleep(delay)

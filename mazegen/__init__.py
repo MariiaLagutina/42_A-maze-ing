@@ -1,4 +1,4 @@
 from mazegen.factory import MazeFactory
-from mazegen.generator import MazeGenerator
+from mazegen.generator import MazeGenerator, MazeRenderer
 
-__all__ = ["MazeFactory", "MazeGenerator"]
+__all__ = ["MazeFactory", "MazeGenerator", "MazeRenderer"]

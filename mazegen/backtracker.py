@@ -1,7 +1,6 @@
 import random
 from typing import List, Tuple, Set, Optional
-from .generator import MazeGenerator
-from renderer.render import ASCIIMazeRenderer
+from .generator import MazeGenerator, MazeRenderer
 import time
 
 
@@ -15,14 +14,17 @@ class BacktrackerGenerator(MazeGenerator):
         self,
         width: int,
         height: int,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        renderer: Optional[MazeRenderer] = None,
     ) -> None:
         super().__init__(width, height, seed)
-        self.renderer: Optional[ASCIIMazeRenderer] = None
+        self.renderer: Optional[MazeRenderer] = renderer
 
-    def generate(self, delay: float = 0.02) -> None:
+    def generate(self, delay: float = 0.02,
+                 renderer: Optional[MazeRenderer] = None) -> None:
         self._draw_42()
-        self.renderer = ASCIIMazeRenderer(self)
+        if renderer is not None:
+            self.renderer = renderer
 
         stack: List[Tuple[int, int]] = []
         visited: Set[Tuple[int, int]] = set()
@@ -62,5 +64,6 @@ class BacktrackerGenerator(MazeGenerator):
             else:
                 # Backtrack
                 stack.pop()
-            self.renderer.render()
-            time.sleep(delay)
+            if self.renderer is not None:
+                self.renderer.render()
+                time.sleep(delay)

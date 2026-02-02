@@ -65,7 +65,8 @@ def gen_new_maze(algorithm: str, width: int,
                  height: int, seed: Optional[int],
                  entry: tuple[int, int],
                  exit_: tuple[int, int],
-                 perfect: bool) -> MazeGenerator:
+                 perfect: bool,
+                 renderer: Optional[object] = None) -> MazeGenerator:
     try:
         maze = MazeFactory.get_maze_generator(
             algorithm=algorithm,
@@ -75,7 +76,10 @@ def gen_new_maze(algorithm: str, width: int,
         )
         maze.start = entry
         maze.end = exit_
-        maze.generate()
+        if renderer is not None:
+            maze.generate(renderer=renderer)
+        else:
+            maze.generate()
         if not perfect:
             maze.make_imperfect()
         return maze
