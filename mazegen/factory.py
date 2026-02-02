@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type
 from .generator import MazeGenerator
 from .backtracker import BacktrackerGenerator
 from .wilson import WilsonGenerator
@@ -30,7 +30,8 @@ class MazeFactory:
         # Get generator class from enum by algorithm name
         algorithm = algorithm.lower().strip()
         try:
-            generator_cls = getattr(_GENERATORS, algorithm).value
+            generator_cls: Type[MazeGenerator] = getattr(_GENERATORS,
+                                                         algorithm).value
         except (KeyError, AttributeError):
             raise ValueError(f"Unknown algorithm: {algorithm}")
 
