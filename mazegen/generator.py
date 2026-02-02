@@ -1,8 +1,7 @@
 import random
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional, Set
+from typing import List, Tuple, Optional, Set, Protocol, Iterable
 from collections import deque
-import time
 
 # Constants for bitwise wall representation
 NORTH = 0b0001  # 1
@@ -18,6 +17,21 @@ OPPOSITE = {
     EAST: WEST,
     WEST: EAST
 }
+
+
+class MazeRenderer(Protocol):
+    """Renderer protocol used by maze generators (Strategy pattern)."""
+
+    def render(self, *args, **kwargs) -> None:
+        ...
+
+    def render_path_animated(self,
+                             walked_path: Iterable[Tuple[int, int]],
+                             delay: float = 0.1,
+                             walk: Optional[Iterable[Tuple[int, int]]] = None,
+                             visited: Optional[Iterable[Tuple[int, int]]] = None
+                             ) -> None:
+        ...
 
 
 class MazeGenerator(ABC):
@@ -164,8 +178,8 @@ class MazeGenerator(ABC):
                     nx, ny = random.choice(candidates)
                     self._remove_wall(x, y, nx, ny)
 
-    def solve(self, renderer=None, delay: float = 0.5,
-              show_path: bool = True) -> str:
+    def solve(self, renderer: Optional[MazeRenderer] = None,
+              delay: float = 0.5, show_path: bool = True) -> str:
         """
         Solves the maze using BFS to find the shortest valid path.
         """
@@ -234,7 +248,7 @@ class MazeGenerator(ABC):
         return cells
 
     @abstractmethod
-    def generate(self) -> None:
+    def generate(self, *args, **kwargs) -> None:
         """
         Child classes must implement the maze generation logic.
         """
