@@ -1,65 +1,10 @@
 import sys
 import os
 from typing import Optional
-from mazegen import MazeFactory, MazeGenerator, MazeRenderer
+from mazegen import MazeFactory
 from renderer import ASCIIMazeRenderer
-from utils import clear
+from utils import clear, save_maze_to_file, parse_config, parse_point
 import readchar
-
-
-def parse_config(file_path: str) -> dict[str, str]:
-    """
-    Parse a key=value configuration file.
-    Keys are case-insensitive.
-    Lines starting with '#' or empty lines are ignored.
-    """
-    config: dict[str, str] = {}
-    try:
-        with open(file_path, "r") as f:
-            for line in f:
-                line = line.strip()
-
-                if not line or line.startswith("#"):
-                    continue
-
-                if "=" not in line:
-                    continue
-
-                key, value = line.split("=", 1)
-                config[key.strip().upper()] = value.strip()
-    except Exception as e:
-        print(f"Error While Config Parsing - {type(e).__name__} - {e}")
-    return config
-
-
-def parse_point(value: str) -> tuple[int, int]:
-    """
-    Parse a coordinate in the form 'x,y'.
-    """
-    try:
-        x_str, y_str = value.split(",")
-        return int(x_str), int(y_str)
-    except Exception:
-        raise ValueError(f"Invalid coordinate format: '{value}'")
-
-
-def save_maze_to_file(
-    generator: MazeGenerator,
-    filename: str,
-    solution: str
-) -> None:
-    """
-    Save the maze grid, start/end coordinates and solution path
-    to a file in the required output format.
-    """
-    with open(filename, "w") as f:
-        for row in generator.grid:
-            f.write("".join(f"{cell:X}" for cell in row) + "\n")
-
-        f.write("\n")
-        f.write(f"{generator.start[0]},{generator.start[1]}\n")
-        f.write(f"{generator.end[0]},{generator.end[1]}\n")
-        f.write(solution + "\n")
 
 
 def main() -> None:
@@ -117,7 +62,7 @@ def main() -> None:
     background_color: Optional[str] = None
 
     path_visible = True
-    regen = False
+    regen = True
     delay = 0.05
     maze = MazeFactory.get_maze_generator(
         algorithm=algorithm,
@@ -138,7 +83,6 @@ def main() -> None:
             )
             maze.start = entry
             maze.end = exit_
-            regen = False
 
         # Convert background color to termcolor format (on_<color>)
         bg = f"on_{background_color}" if background_color else None
@@ -155,12 +99,11 @@ def main() -> None:
             blocked_color=blocked_color,
             background=bg
         )
-        if renderer:
+        if regen:
             maze.generate(delay=delay, renderer=renderer)
-        else:
-            maze.generate(delay=delay)
-        if not perfect:
-            maze.make_imperfect()
+            if not perfect:
+                maze.make_imperfect()
+            regen = False
 
         # Show the maze first
         renderer.render()
@@ -169,6 +112,8 @@ def main() -> None:
         path = maze.solve(renderer=renderer if path_visible else None,
                           delay=delay,
                           show_path=path_visible)
+        if maze.message_42:
+            print("\n" + maze.message_42)
         print(
             str("\nCommands: [SPACE] regenerate |"
                 " [P] toggle path | [C] change colors | [Q] quit"))
@@ -182,8 +127,8 @@ def main() -> None:
             path_visible = not path_visible
         elif key == "c":
             # Change colors
-            print("\nAvailable colors: red, green, yellow,\
-                   blue, magenta, cyan, white")
+            print(str("\nAvailable colors: red, green, yellow,"
+                  " blue, magenta, cyan, white"))
             print("(Leave empty to keep current color)\n")
 
             c = input("Wall color: ")
@@ -197,7 +142,7 @@ def main() -> None:
                 blocked_color = c
 
             c = input(
-                "Background color (or 'none' for no background): ")
+                "Background color: ")
             if c:
                 c = c.strip().lower()
                 background_color = None if c == "none" else c
