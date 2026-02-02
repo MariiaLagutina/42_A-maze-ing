@@ -61,7 +61,7 @@ class MazeGenerator(ABC):
         self.width = width
         self.height = height
         self.seed = seed
-
+        self.message_42: str = ""
         if seed is not None:
             random.seed(seed)
 
@@ -79,8 +79,8 @@ class MazeGenerator(ABC):
         self.solution_cells: Optional[List[Tuple[int, int]]] = None
 
         # Minimal size required to draw the "42" pattern safely
-        self.min_width_42: int = 12
-        self.min_height_42: int = 10
+        self.min_width_42: int = 11
+        self.min_height_42: int = 9
         # Possible movement directions (dx, dy)
         self.possible_moves: List[Tuple[int, int]] = [
             (0, -1),  # North
@@ -95,26 +95,23 @@ class MazeGenerator(ABC):
         to the blocked set. Blocked cells remain fully closed.
         """
         if self.width < self.min_width_42 or self.height < self.min_height_42:
-            print("Error: Maze too small for '42' pattern.")
+            self.message_42 = str("Info: Maze too small for '42'"
+                                  " pattern. So it won't be drawn.")
             return
-
-        cx, cy = self.width // 2, self.height // 2
-
         digit_4 = [
-            (-4, -2), (-2, -2),
-            (-4, -1), (-2, -1),
-            (-4, 0), (-3, 0), (-2, 0),
-            (-2, 1),
-            (-2, 2)
+            (-4, -2), (-2, -2), (-4, -1), (-2, -1), (-4, 0),
+            (-3, 0), (-2, 0), (-2, 1), (-2, 2)
         ]
 
         digit_2 = [
-            (1, -2), (2, -2), (3, -2),
-            (3, -1),
-            (1, 0), (2, 0), (3, 0),
-            (1, 1),
-            (1, 2), (2, 2), (3, 2)
+            (1, -2), (2, -2), (3, -2), (3, -1), (1, 0), (2, 0),
+            (3, 0), (1, 1), (1, 2), (2, 2), (3, 2)
         ]
+
+        if self.width == 11:
+            digit_4 = [(x + 1, y) for x, y in digit_4]
+
+        cx, cy = self.width // 2, self.height // 2
 
         for dx, dy in digit_4 + digit_2:
             x, y = cx + dx, cy + dy
