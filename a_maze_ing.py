@@ -62,33 +62,6 @@ def save_maze_to_file(
         f.write(solution + "\n")
 
 
-def gen_new_maze(algorithm: str, width: int,
-                 height: int, seed: Optional[int],
-                 entry: tuple[int, int],
-                 exit_: tuple[int, int],
-                 perfect: bool,
-                 renderer: Optional[MazeRenderer] = None) -> MazeGenerator:
-    try:
-        maze = MazeFactory.get_maze_generator(
-            algorithm=algorithm,
-            width=width,
-            height=height,
-            seed=seed
-        )
-        maze.start = entry
-        maze.end = exit_
-        if renderer is not None:
-            maze.generate(renderer=renderer)
-        else:
-            maze.generate()
-        if not perfect:
-            maze.make_imperfect()
-        return maze
-    except Exception as e:
-        print(f"Error: {e}")
-        raise Exception("Failed to create maze generator.")
-
-
 def main() -> None:
     if len(sys.argv) != 2:
         print("Usage: python3 a_maze_ing.py <config_file>")
@@ -146,28 +119,27 @@ def main() -> None:
     path_visible = True
     regen = False
     delay = 0.05
-    maze = gen_new_maze(
+    maze = MazeFactory.get_maze_generator(
         algorithm=algorithm,
         width=width,
         height=height,
-        seed=seed,
-        entry=entry,
-        exit_=exit_,
-        perfect=perfect)
+        seed=seed
+    )
+    maze.start = entry
+    maze.end = exit_
     while True:
         clear()
         if regen:
-            maze = gen_new_maze(
+            maze = MazeFactory.get_maze_generator(
                 algorithm=algorithm,
                 width=width,
                 height=height,
-                seed=seed,
-                entry=entry,
-                exit_=exit_,
-                perfect=perfect
+                seed=seed
             )
+            maze.start = entry
+            maze.end = exit_
             regen = False
-        # Apply entry / exit from config
+
         # Convert background color to termcolor format (on_<color>)
         bg = f"on_{background_color}" if background_color else None
 
@@ -183,6 +155,12 @@ def main() -> None:
             blocked_color=blocked_color,
             background=bg
         )
+        if renderer:
+            maze.generate(delay=delay, renderer=renderer)
+        else:
+            maze.generate(delay=delay)
+        if not perfect:
+            maze.make_imperfect()
 
         # Show the maze first
         renderer.render()
