@@ -110,7 +110,7 @@ def main() -> None:
             renderer.render()
 
             # Solve and animate path only if path_visible is True
-            path = maze.solve(renderer=renderer if path_visible else None,
+            path = maze.solve(renderer=renderer,
                               delay=delay,
                               show_path=path_visible)
             save_maze_to_file(maze, output_file, "".join(path))
