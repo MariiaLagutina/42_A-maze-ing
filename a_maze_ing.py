@@ -23,7 +23,9 @@ def main() -> None:
         width: int = int(config.get("WIDTH", 20))
         height: int = int(config.get("HEIGHT", 20))
         algorithm: str = config.get("ALGO", "backtracker")
-        output_file: str = config.get("OUTPUT_FILE", "maze.txt")
+        op_file_path: str = str(config.get("OUTPUT_FILE", "")).strip().strip(
+            "\"").strip("'").strip()
+        output_file: str = op_file_path or "maze.txt"
 
         seed: Optional[int] = (
             int(config["SEED"]) if "SEED" in config else None
