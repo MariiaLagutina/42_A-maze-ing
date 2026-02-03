@@ -1,23 +1,30 @@
-.PHONY: install run debug clean lint lint-strict
+.PHONY: install run debug clean lint lint-strict installation_check
 
 SYS_PYTHON := python3
 VENV := .venv
-PYTHON = $(VENV)/bin/python3
+PYTHON := $(VENV)/bin/python3
 ARGS := $(wordlist 2, 999, $(MAKECMDGOALS))
 
-$(VENV):
-	@if [ ! -d "$(VENV)" ]; then \
-		$(SYS_PYTHON) -m venv $(VENV); \
-	fi
+$(VENV)/pyvenv.cfg:
+	@echo "Creating virtual environment..."
+	@$(SYS_PYTHON) -m venv $(VENV)
+
+$(VENV): $(VENV)/pyvenv.cfg
+	@$(SYS_PYTHON) -m venv $(VENV)
 
 install: $(VENV)
-	@$(PYTHON) -m pip install --upgrade pip
+	@$(PYTHON) -m pip install --upgrade pip flake8 mypy numpy termcolor readchar
 	@$(PYTHON) -m pip install -e ./mazegen
-	@$(PYTHON) -m pip install flake8 mypy numpy termcolor readchar
 
 installation_check:
-	@if [ ! -d "$(VENV)" ]; then \
-		echo "Please run 'make install' first"; \
+	@if [ ! -f "$(VENV)/pyvenv.cfg" ]; then \
+		echo "Virtual environment missing. Run 'make install'." >&2; \
+		exit 1; \
+	fi
+	@if ! $(PYTHON) -c "import sys" >/dev/null 2>&1; then \
+		echo "Virtual environment Python is broken. Removing it..." >&2; \
+		rm -rf $(VENV); \
+		echo "Please run 'make install' to recreate the virtual environment." >&2; \
 		exit 1; \
 	fi
 
