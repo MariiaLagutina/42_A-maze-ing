@@ -1,5 +1,5 @@
 from typing import Iterable, Tuple, Optional, Dict, Any, List
-from termcolor import colored  # type: ignore[import-not-found]
+from termcolor import colored
 from mazegen.generator import MazeGenerator, NORTH, SOUTH, EAST, WEST
 from utils import clear
 import time

@@ -1,43 +1,48 @@
 .PHONY: install run debug clean lint lint-strict
 
-PYTHON := python3
+SYS_PYTHON := python3
 VENV := .venv
-BIN := $(VENV)/bin
+PYTHON = $(VENV)/bin/python3
 ARGS := $(wordlist 2, 999, $(MAKECMDGOALS))
 
-install:
+$(VENV):
 	@if [ ! -d "$(VENV)" ]; then \
-		$(PYTHON) -m venv $(VENV); \
+		$(SYS_PYTHON) -m venv $(VENV); \
 	fi
-	@$(BIN)/pip install --upgrade pip
-	@$(BIN)/pip install -e ./mazegen
-	@$(BIN)/pip install flake8 mypy numpy termcolor readchar
 
-run:
+install: $(VENV)
+	@$(PYTHON) -m pip install --upgrade pip
+	@$(PYTHON) -m pip install -e ./mazegen
+	@$(PYTHON) -m pip install flake8 mypy numpy termcolor readchar
+
+installation_check:
 	@if [ ! -d "$(VENV)" ]; then \
 		echo "Please run 'make install' first"; \
 		exit 1; \
 	fi
-	@$(BIN)/python a_maze_ing.py $(ARGS)
 
-debug:
-	@$(BIN)/python -m pdb a_maze_ing.py $(ARGS)
+run: installation_check
+	@$(PYTHON) a_maze_ing.py $(ARGS)
+
+debug: installation_check
+	@$(PYTHON) -m pdb a_maze_ing.py $(ARGS)
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	find . -type d -name "mazegen_42.egg-info" -exec rm -rf {} +
 	find . -name "*.pyc" -delete
 
-lint:
-	@$(BIN)/flake8 .
-	@$(BIN)/mypy . \
+lint: installation_check
+	@$(PYTHON) -m flake8 --exclude .venv,venv,env .
+	@$(PYTHON) -m mypy . \
 		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
 		--disallow-untyped-defs \
 		--check-untyped-defs
 
-lint-strict:
-	@$(BIN)/flake8 .
-	@$(BIN)/mypy . --strict
+lint-strict: installation_check
+	@$(PYTHON) -m flake8 --exclude .venv,venv,env .
+	@$(PYTHON) -m mypy . --strict
