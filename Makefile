@@ -37,7 +37,7 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	find . -type d -name "mazegen_42.egg-info" -exec rm -rf {} +
+	find . -type d -name "mazegen.egg-info" -exec rm -rf {} +
 	find . -name "*.pyc" -delete
 
 lint: installation_check
