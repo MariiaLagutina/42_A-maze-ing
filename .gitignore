@@ -8,4 +8,10 @@ venv/
 maze.txt
 .venv/
 *.egg-info/
-
+dist/
+build/
+*.log
+.DS_Store
+.mypy_cache/
+.pytest_cache/
+.ipynb_checkpoints/

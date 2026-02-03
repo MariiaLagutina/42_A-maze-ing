@@ -1,6 +1,6 @@
 from typing import Iterable, Tuple, Optional, Dict, Any, List
 from termcolor import colored
-from mazegen.generator import MazeGenerator, NORTH, SOUTH, EAST, WEST
+from mazegen.generator import MazeGenerator, Direction
 from utils import clear
 import time
 
@@ -62,7 +62,7 @@ class ASCIIMazeRenderer:
         # Top border
         line: str = "+"
         for x in range(m.width):
-            if (m.grid[0][x] & NORTH):
+            if (m.grid[0][x] & Direction.NORTH):
                 line += colored("---+", self.wall_color,
                                 on_color=self.bg)
             else:
@@ -77,7 +77,7 @@ class ASCIIMazeRenderer:
                 cell = m.grid[y][x]
 
                 # West wall
-                if (cell & WEST):
+                if (cell & Direction.WEST):
                     row += colored("|", self.wall_color,
                                    on_color=self.bg)
                 else:
@@ -130,7 +130,7 @@ class ASCIIMazeRenderer:
                                    ) if self.bg else "   "
 
             # East wall of last cell
-            if (m.grid[y][m.width - 1] & EAST):
+            if (m.grid[y][m.width - 1] & Direction.EAST):
                 row += colored("|", self.wall_color, on_color=self.bg)
             else:
                 row += colored(" ", None,
@@ -143,7 +143,7 @@ class ASCIIMazeRenderer:
                 "+", None, on_color=self.bg
             ) if self.bg else "+"
             for x in range(m.width):
-                if (m.grid[y][x] & SOUTH):
+                if (m.grid[y][x] & Direction.SOUTH):
                     row += colored("---+", self.wall_color,
                                    on_color=self.bg)
                 else:

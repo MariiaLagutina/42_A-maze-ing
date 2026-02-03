@@ -2,21 +2,27 @@ import random
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Set, Protocol, Iterable, Dict, Any
 from collections import deque
+from enum import IntEnum
 
-# Constants for bitwise wall representation
-NORTH = 0b0001  # 1
-EAST = 0b0010   # 2
-SOUTH = 0b0100  # 4
-WEST = 0b1000   # 8
-ALL_WALLS = 0b1111  # 15 (0xF)
 
-# Helper for removing walls in the opposite direction
-OPPOSITE = {
-    NORTH: SOUTH,
-    SOUTH: NORTH,
-    EAST: WEST,
-    WEST: EAST
-}
+class Direction(IntEnum):
+    """Bitwise wall representation for maze directions."""
+    NORTH = 0b0001  # 1
+    EAST = 0b0010   # 2
+    SOUTH = 0b0100  # 4
+    WEST = 0b1000   # 8
+    ALL_WALLS = 0b1111  # 15 (0xF)
+
+    @classmethod
+    def opposite(cls, direction: 'Direction') -> 'Direction':
+        """Get the opposite direction."""
+        opposites = {
+            cls.NORTH: cls.SOUTH,
+            cls.SOUTH: cls.NORTH,
+            cls.EAST: cls.WEST,
+            cls.WEST: cls.EAST
+        }
+        return opposites[direction]
 
 
 class MazeRenderer(Protocol):
@@ -67,7 +73,7 @@ class MazeGenerator(ABC):
 
         # Initialize grid: all cells start with all walls closed
         self.grid: List[List[int]] = [
-            [ALL_WALLS for _ in range(width)] for _ in range(height)
+            [Direction.ALL_WALLS for _ in range(width)] for _ in range(height)
         ]
 
         self.start: Tuple[int, int] = (0, 0)
@@ -127,18 +133,18 @@ class MazeGenerator(ABC):
             return
 
         if x2 == x1 and y2 == y1 - 1:
-            direction = NORTH
+            direction = Direction.NORTH
         elif x2 == x1 + 1 and y2 == y1:
-            direction = EAST
+            direction = Direction.EAST
         elif x2 == x1 and y2 == y1 + 1:
-            direction = SOUTH
+            direction = Direction.SOUTH
         elif x2 == x1 - 1 and y2 == y1:
-            direction = WEST
+            direction = Direction.WEST
         else:
             return
 
         self.grid[y1][x1] &= ~direction
-        self.grid[y2][x2] &= ~OPPOSITE[direction]
+        self.grid[y2][x2] &= ~Direction.opposite(direction)
 
     def make_imperfect(self, threshold: float = 0.005) -> None:
         """
@@ -149,7 +155,10 @@ class MazeGenerator(ABC):
             threshold: Probability of removing a wall per cell
             (small value recommended).
         """
-        directions = [NORTH, SOUTH, EAST, WEST]
+        directions = [
+            Direction.NORTH, Direction.SOUTH,
+            Direction.EAST, Direction.WEST
+        ]
 
         for y in range(self.height):
             for x in range(self.width):
@@ -165,13 +174,13 @@ class MazeGenerator(ABC):
                 for d in directions:
                     if self.grid[y][x] & d:
                         nx, ny = x, y
-                        if d == NORTH:
+                        if d == Direction.NORTH:
                             ny -= 1
-                        elif d == SOUTH:
+                        elif d == Direction.SOUTH:
                             ny += 1
-                        elif d == EAST:
+                        elif d == Direction.EAST:
                             nx += 1
-                        elif d == WEST:
+                        elif d == Direction.WEST:
                             nx -= 1
 
                         if (
@@ -194,10 +203,10 @@ class MazeGenerator(ABC):
         visited = {self.start}
 
         moves = [
-            (NORTH, 0, -1, 'N'),
-            (SOUTH, 0, 1, 'S'),
-            (EAST, 1, 0, 'E'),
-            (WEST, -1, 0, 'W')
+            (Direction.NORTH, 0, -1, 'N'),
+            (Direction.SOUTH, 0, 1, 'S'),
+            (Direction.EAST, 1, 0, 'E'),
+            (Direction.WEST, -1, 0, 'W')
         ]
 
         while queue:
