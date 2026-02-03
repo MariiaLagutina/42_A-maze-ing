@@ -5,7 +5,10 @@ from mazegen import MazeGenerator
 
 def clear() -> None:
     """Clear the terminal screen."""
-    os.system("clear" if os.name == "posix" else "cls")
+    try:
+        os.system("clear" if os.name == "posix" else "cls")
+    except Exception:
+        raise RuntimeError("Unable to clear the terminal screen.")
 
 
 def save_maze_to_file(
@@ -17,14 +20,17 @@ def save_maze_to_file(
     Save the maze grid, start/end coordinates and solution path
     to a file in the required output format.
     """
-    with open(filename, "w") as f:
-        for row in generator.grid:
-            f.write("".join(f"{cell:X}" for cell in row) + "\n")
+    try:
+        with open(filename, "w") as f:
+            for row in generator.grid:
+                f.write("".join(f"{cell:X}" for cell in row) + "\n")
 
-        f.write("\n")
-        f.write(f"{generator.start[0]},{generator.start[1]}\n")
-        f.write(f"{generator.end[0]},{generator.end[1]}\n")
-        f.write(solution + "\n")
+            f.write("\n")
+            f.write(f"{generator.start[0]},{generator.start[1]}\n")
+            f.write(f"{generator.end[0]},{generator.end[1]}\n")
+            f.write(solution + "\n")
+    except Exception as e:
+        raise ValueError(f"Error While Saving Maze - {type(e).__name__} - {e}")
 
 
 def parse_point(value: str) -> tuple[int, int]:
@@ -34,8 +40,8 @@ def parse_point(value: str) -> tuple[int, int]:
     try:
         x_str, y_str = value.split(",")
         return int(x_str), int(y_str)
-    except Exception:
-        raise ValueError(f"Invalid coordinate format: '{value}'")
+    except Exception as e:
+        raise ValueError(f"Invalid coordinate format: '{value}' - {e}")
 
 
 def parse_config(file_path: str) -> dict[str, str]:
@@ -46,6 +52,10 @@ def parse_config(file_path: str) -> dict[str, str]:
     """
     config: dict[str, str] = {}
     try:
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(
+                f"Config file '{file_path}' not found.")
+
         with open(file_path, "r") as f:
             for line in f:
                 line = line.strip()
@@ -58,6 +68,6 @@ def parse_config(file_path: str) -> dict[str, str]:
 
                 key, value = line.split("=", 1)
                 config[key.strip().upper()] = value.strip()
+        return config
     except Exception as e:
-        print(f"Error While Config Parsing - {type(e).__name__} - {e}")
-    return config
+        raise ValueError(f"{e}")

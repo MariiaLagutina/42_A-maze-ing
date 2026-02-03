@@ -1,5 +1,4 @@
 import sys
-import os
 from typing import Optional
 from mazegen import MazeFactory
 from renderer import ASCIIMazeRenderer
@@ -14,14 +13,10 @@ def main() -> None:
 
     config_path = sys.argv[1]
 
-    if not os.path.isfile(config_path):
-        print(f"Error: Config file '{config_path}' not found.")
-        return
-
     try:
         config = parse_config(config_path)
-    except OSError as e:
-        print(f"Error reading config file: {e}")
+    except Exception as e:
+        print(f"Parsing Error: {e}")
         return
 
     try:
@@ -60,92 +55,99 @@ def main() -> None:
     frontier_color: str = "blue"
     current_color: str = "red"
     background_color: Optional[str] = None
-
     path_visible = True
     regen = True
     delay = 0.05
-    maze = MazeFactory.get_maze_generator(
-        algorithm=algorithm,
-        width=width,
-        height=height,
-        seed=seed
-    )
-    maze.start = entry
-    maze.end = exit_
-    while True:
-        clear()
-        if regen:
-            maze = MazeFactory.get_maze_generator(
-                algorithm=algorithm,
-                width=width,
-                height=height,
-                seed=seed
-            )
-            maze.start = entry
-            maze.end = exit_
-
-        # Convert background color to termcolor format (on_<color>)
-        bg = f"on_{background_color}" if background_color else None
-
-        renderer = ASCIIMazeRenderer(
-            maze,
-            wall_color=wall_color,
-            start_color="green",
-            end_color="red",
-            path_color=path_color,
-            visited_color=visited_color,
-            frontier_color=frontier_color,
-            current_color=current_color,
-            blocked_color=blocked_color,
-            background=bg
+    try:
+        maze = MazeFactory.get_maze_generator(
+            algorithm=algorithm,
+            width=width,
+            height=height,
+            seed=seed
         )
-        if regen:
-            maze.generate(delay=delay, renderer=renderer)
-            if not perfect:
-                maze.make_imperfect()
-            regen = False
+        maze.start = entry
+        maze.end = exit_
 
-        # Show the maze first
-        renderer.render()
+        while True:
+            clear()
+            if regen:
+                maze = MazeFactory.get_maze_generator(
+                    algorithm=algorithm,
+                    width=width,
+                    height=height,
+                    seed=seed
+                )
+                maze.start = entry
+                maze.end = exit_
 
-        # Solve and animate path only if path_visible is True
-        path = maze.solve(renderer=renderer if path_visible else None,
-                          delay=delay,
-                          show_path=path_visible)
-        if maze.message_42:
-            print("\n" + maze.message_42)
-        print(
-            str("\nCommands: [SPACE] regenerate |"
-                " [P] toggle path | [C] change colors | [Q] quit"))
-        key = readchar.readchar().lower()
+            # Convert background color to termcolor format (on_<color>)
+            bg = f"on_{background_color}" if background_color else None
 
-        if key == "q":
-            break
-        elif key == " ":
-            regen = True  # regenerate
-        elif key == "p":
-            path_visible = not path_visible
-        elif key == "c":
-            # Change colors
-            print(str("\nAvailable colors: red, green, yellow,"
-                  " blue, magenta, cyan, white"))
-            print("(Leave empty to keep current color)\n")
+            renderer = ASCIIMazeRenderer(
+                maze,
+                wall_color=wall_color,
+                start_color="green",
+                end_color="red",
+                path_color=path_color,
+                visited_color=visited_color,
+                frontier_color=frontier_color,
+                current_color=current_color,
+                blocked_color=blocked_color,
+                background=bg
+            )
+            if regen:
+                if renderer:
+                    maze.generate(delay=delay, renderer=renderer)
+                else:
+                    maze.generate()
+                if not perfect:
+                    maze.make_imperfect()
+                regen = False
 
-            c = input("Wall color: ")
-            if c:
-                c = c.strip().lower()
-                wall_color = c
+            # Show the maze first
+            renderer.render()
 
-            c = input("42 pattern color: ")
-            if c:
-                c = c.strip().lower()
-                blocked_color = c
+            # Solve and animate path only if path_visible is True
+            path = maze.solve(renderer=renderer if path_visible else None,
+                              delay=delay,
+                              show_path=path_visible)
+            if maze.message_42:
+                print("\n" + maze.message_42)
+            print(
+                str("\nCommands: [SPACE] regenerate |"
+                    " [P] toggle path | [C] change colors | [Q] quit"))
+            key = readchar.readchar().lower()
 
-            c = input(
-                "Background color: ")
-            if c:
-                c = c.strip().lower()
-                background_color = None if c == "none" else c
+            if key == "q":
+                break
+            elif key == " ":
+                regen = True  # regenerate
+            elif key == "p":
+                path_visible = not path_visible
+            elif key == "c":
+                # Change colors
+                print(str("\nAvailable colors: red, green, yellow,"
+                          " blue, magenta, cyan, white"))
+                print("(Leave empty to keep current color)\n")
+
+                c = input("Wall color: ")
+                if c:
+                    c = c.strip().lower()
+                    wall_color = c
+
+                c = input("42 pattern color: ")
+                if c:
+                    c = c.strip().lower()
+                    blocked_color = c
+
+                c = input(
+                    "Background color: ")
+                if c:
+                    c = c.strip().lower()
+                    background_color = None if c == "none" else c
+    except Exception as e:
+        print(f"Error: {e}")
+        return
 
     # Save maze on exit
     try:
