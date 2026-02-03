@@ -111,12 +111,17 @@ def main() -> None:
             path = maze.solve(renderer=renderer if path_visible else None,
                               delay=delay,
                               show_path=path_visible)
+            save_maze_to_file(maze, output_file, "".join(path))
+            print(f"Maze saved to '{output_file}'")
             if maze.message_42:
                 print("\n" + maze.message_42)
             print(
                 str("\nCommands: [SPACE] regenerate |"
                     " [P] toggle path | [C] change colors | [Q] quit"))
-            key = readchar.readchar().lower()
+            key = readchar.readchar()
+            if key == "\x03":
+                raise KeyboardInterrupt
+            key = key.lower()
 
             if key == "q":
                 break
@@ -145,16 +150,12 @@ def main() -> None:
                 if c:
                     c = c.strip().lower()
                     background_color = None if c == "none" else c
+
+    except KeyboardInterrupt:
+        print("\nInterrupted. Exiting...")
     except Exception as e:
         print(f"Error: {e}")
         return
-
-    # Save maze on exit
-    try:
-        save_maze_to_file(maze, output_file, "".join(path))
-        print(f"Maze saved to '{output_file}'")
-    except Exception as e:
-        print(f"Error saving maze: {e}")
 
 
 if __name__ == "__main__":
