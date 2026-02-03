@@ -14,7 +14,6 @@ $(VENV): $(VENV)/pyvenv.cfg
 
 install: $(VENV)
 	@$(PYTHON) -m pip install --upgrade pip flake8 mypy numpy termcolor readchar
-	@$(PYTHON) -m pip install -e ./mazegen
 
 installation_check:
 	@if [ ! -f "$(VENV)/pyvenv.cfg" ]; then \

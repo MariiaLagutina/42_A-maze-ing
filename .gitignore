@@ -7,4 +7,5 @@ mlx-2.2-py3-ubuntu-any.whl
 venv/
 maze.txt
 .venv/
-mazegen_42.egg-info/
+*.egg-info/
+
