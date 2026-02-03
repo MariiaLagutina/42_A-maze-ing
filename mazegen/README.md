@@ -10,11 +10,12 @@ user input, or application-specific code.
 ## Public API
 
 ```python
-from mazegen import MazeFactory, MazeGenerator
+from mazegen import MazeFactory, MazeGenerator, MazeRenderer
 ```
 
 - MazeGenerator — abstract base class implementing shared maze logic
 - MazeFactory — factory used to instantiate concrete maze generators
+- MazeRenderer — renderer protocol for optional animation hooks
 
 ---
 
@@ -24,7 +25,7 @@ MazeGenerator is an abstract base class implementing common behavior:
 
 - grid initialization using bitwise wall representation
 - entry and exit handling
-- mandatory embedded “42” pattern
+- optional embedded “42” pattern (blocked cells)
 - consistent wall removal between adjacent cells
 - shortest-path solving using Breadth-First Search (BFS)
 - optional conversion from perfect to imperfect mazes
@@ -86,7 +87,7 @@ This representation is compatible with hexadecimal maze output formats.
 - Wall coherence and full connectivity rules are always enforced
 
 If the maze is too small to draw the “42” pattern, generation continues
-without it and an error message is printed.
+without it and `message_42` is set with an informational message.
 
 ---
 
@@ -95,9 +96,9 @@ without it and an error message is printed.
 Maze solving is implemented using Breadth-First Search (BFS), guaranteeing
 the shortest valid path between the entry and exit points.
 
-The solution is returned as:
-- a string of directions (N, E, S, W)
-- an ordered list of visited cells
+The solution is returned as a string of directions (N, E, S, W). The
+ordered list of cells is stored on the generator as `solution_cells`.
+If no path exists, an empty string is returned.
 
 ---
 
@@ -117,3 +118,15 @@ generators to be added without modifying existing code.
 
 mazegen contains no rendering, input handling, or UI logic.
 It is intended to be reused in other projects.
+
+---
+
+## API Notes
+
+- `MazeFactory.get_maze_generator(algorithm, width, height, seed=None)`
+    accepts `algorithm` values: `backtracker`, `wilson`.
+- `MazeGenerator.generate(delay=0.02, renderer=None)` optionally animates
+    generation with a `MazeRenderer` implementation.
+- `MazeGenerator.solve(renderer=None, delay=0.5, show_path=True)` optionally
+    animates solution; `solution_path` and `solution_cells` are cached on the
+    instance.

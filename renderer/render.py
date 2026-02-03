@@ -50,7 +50,7 @@ class ASCIIMazeRenderer:
                current: Optional[Tuple[int, int]] = None,
                walked_path: Optional[Iterable[Tuple[int, int]]] = None,
                arrow: Optional[str] = None,
-               path_directions: Optional[Dict[Any, Any]] = {}):
+               path_directions: Optional[Dict[Any, Any]] = {}) -> None:
         walk = set(walk or [])
         visited = set(visited or [])
         frontier = set(frontier or [])
@@ -157,7 +157,7 @@ class ASCIIMazeRenderer:
                              delay: float = 0.1,
                              walk: Optional[Iterable[Tuple[int, int]]] = None,
                              visited: Optional[Iterable[Tuple[int, int]]
-                                               ] = None):
+                                               ] = None) -> None:
         path_list: List[Tuple[int, int]] = list(walked_path)
         walk = set(walk or [])
         visited = set(visited or [])
