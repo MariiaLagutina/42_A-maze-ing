@@ -6,11 +6,47 @@ An advanced maze generation and visualization tool written in Python, featuring 
 
 ---
 
+## Quick Start
+
+```bash
+# Install dependencies
+make install
+
+# Run with default configuration
+make run config.txt
+
+# Run with custom configuration
+make run your_config.txt
+
+# Clean build artifacts
+make clean
+```
+
+---
+
 ## Description
 
 **A-Maze-Ing** is a maze generation project designed to explore algorithmic maze construction, graph traversal, and clean software architecture.
 
 The program reads a configuration file, generates a valid maze respecting strict structural constraints, visually renders the maze in the terminal, and computes the shortest path between an entry and an exit point. All generation logic is encapsulated in a reusable module, allowing the maze generator to be reused independently of the visualization layer.
+
+---
+
+## Configuration
+
+The application reads a `config.txt` file with the following parameters:
+
+| Parameter | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `WIDTH` | int | 20 | Maze width (must be positive) |
+| `HEIGHT` | int | 20 | Maze height (must be positive) |
+| `ENTRY` | x,y | 0,0 | Entry point coordinates (0-indexed) |
+| `EXIT` | x,y | WIDTH-1,HEIGHT-1 | Exit point coordinates |
+| `ALGO` | string | backtracker | Generation algorithm: `backtracker` or `wilson` |
+| `PERFECT` | bool | true | Generate perfect maze (no loops) or imperfect |
+| `OUTPUT_FILE` | string | maze.txt | Output filename for maze data |
+| `SEED` | int | (none) | Random seed for reproducibility (optional) |
+
 
 ---
 
@@ -140,29 +176,79 @@ Features include:
 
 ### Interactive Controls
 
-During execution, the following keyboard controls are available:
+During execution, use the following keyboard controls in real time:
 
-* **SPACE** — regenerate the maze
-* **P** — toggle shortest-path visualization
-* **C** — change colors (walls, pattern, background)
-* **Q** — quit the application
+| Key | Action |
+| --- | ------ |
+| **SPACE** | Regenerate the maze with the same algorithm |
+| **P** | Toggle shortest-path visualization on/off |
+| **C** | Change colors |
+| **Q** | Quit the application |
 
-All interactions are handled in real time using single-key input.
+## Usage
+
+### Running the Application
+
+```bash
+# Run with default config
+python3 a_maze_ing.py config.txt
+
+# Or using make
+make run config.txt
+
+# Debug mode with Python debugger
+make debug config.txt
+```
+
+### Output Format
+
+The maze is saved to the configured output file (default: `maze.txt`) in the following format:
+
+```
+[Grid as hexadecimal - one digit per cell]
+
+[Entry coordinates: x,y]
+[Exit coordinates: x,y]
+[Solution path: sequence of N/E/S/W directions]
+```
+
+Each cell's hexadecimal digit represents walls in all four directions (bit encoding: N=1, E=2, S=4, W=8).
 
 ---
 
-## Output File Format
+## Development & Maintenance
 
-The generated maze is written to an output file using one hexadecimal digit per cell, encoding the wall configuration.
+### Code Quality
 
-After the grid representation, the file contains:
+```bash
+# Run linting and type checks
+make lint
 
-1. an empty line
-2. entry coordinates
-3. exit coordinates
-4. the shortest path expressed as `N`, `E`, `S`, `W`
+# Strict mode (more rigorous checks)
+make lint-strict
 
-This output format can be validated automatically using the script provided with the subject.
+# Clean build artifacts
+make clean
+```
+
+### Project Structure
+
+```
+.
+├── a_maze_ing.py              # Main application entry point
+├── config.txt                 # Configuration file
+├── utils.py                   # Utility functions
+├── mazegen/                   # Reusable maze generation module
+│   ├── generator.py           # Base MazeGenerator class
+│   ├── factory.py             # MazeFactory for algorithm selection
+│   ├── backtracker.py         # Recursive Backtracker (DFS)
+│   ├── wilson.py              # Wilson's Algorithm
+│   └── __init__.py            # Module exports
+├── renderer/                  # Terminal rendering module
+│   ├── render.py              # ASCIIMazeRenderer
+│   └── __init__.py            # Module exports
+└── README.md                  # This file
+```
 
 ---
 
@@ -170,13 +256,39 @@ This output format can be validated automatically using the script provided with
 
 The `mazegen` module is fully reusable and independent from rendering or user input.
 
-It exposes:
+### Module Features
 
-* a common `MazeGenerator` interface
-* a factory for algorithm selection
-* generation, imperfection, and solving logic
+- **Common `MazeGenerator` interface** — all algorithms share a unified base
+- **MazeFactory pattern** — dynamic algorithm selection
+- **Generation, imperfection, and solving logic** — complete maze lifecycle
+- **Standalone packaging** — can be installed independently
 
-The module can be packaged and installed independently using standard Python packaging tools.
+### Using the Module
+
+```python
+from mazegen import MazeFactory
+
+# Create a maze generator
+generator = MazeFactory.get_maze_generator(
+    algorithm="backtracker",
+    width=20,
+    height=20,
+    seed=42
+)
+
+# Set entry and exit points
+generator.start = (0, 0)
+generator.end = (19, 19)
+
+# Generate the maze
+generator.generate()
+
+# Solve it
+solution_path = generator.solve()  # Returns "EESSWWNNN..."
+
+# Access the grid
+grid = generator.grid  # 2D list of hex-encoded cell values
+```
 
 ---
 
@@ -214,42 +326,42 @@ The module can be packaged and installed independently using standard Python pac
 
 ---
 
-## Team & Project Management
+## Team & Contributions
 
-### Team Members
+**Mariia Lagutina (mlagutin)**
+Maze generation algorithms, reusable `mazegen` module, core architecture, BFS pathfinding, 42 pattern logic, Makefile and project setup
 
-- **Mariia Lagutina (mlagutin)** — maze generation algorithms, reusable `mazegen` module, core architecture, BFS pathfinding, 42 pattern logic, Makefile and project setup
-- **Jayesh Manani (jmanani)** — terminal renderer, ASCII visualization, animations, color design, user interaction
-
-
-### Planning & Evolution
-
-The project was developed iteratively, starting with core maze validity and constraints, followed by algorithm implementation, visualization, and finally packaging and documentation.
-
-### What Worked Well
-
-* clear separation between generation and rendering
-* reusable and extensible architecture
-* interactive visualization aiding debugging and validation
-
-### What Could Be Improved
-
-* additional generation algorithms (Kruskal, Prim)
-* alternative rendering backends (graphical UI)
-* more extensive automated testing
+**Jayesh Manani (jmanani)**
+Terminal renderer, ASCII visualization, animations, color design, user interaction, refractoring code
 
 ---
 
-## Use of AI
+## Project Development
 
-Artificial Intelligence Integration Policy
+### Approach
 
-To ensure high code quality, LLM-based tools were used for static analysis and refinement to:
+The project was developed iteratively, starting with core maze validity and constraints, followed by algorithm implementation, visualization, and finally packaging and documentation.
 
-* analyze complex design patterns for edge-case coverage
+### Key Achievements
 
-* validate deployment and packaging scripts
+- Clear separation between generation and rendering layers
+- Reusable and extensible architecture enabling independent module usage
+- Interactive visualization providing real-time debugging and validation
 
-* proofread technical documentation for professional terminology
+### Future Enhancements
+
+- Additional generation algorithms (Kruskal, Prim)
+- Alternative rendering backends (graphical UI, web-based)
+- Comprehensive automated test suite
+
+---
+
+## AI Integration
+
+To ensure high code quality, LLM-based tools were used for:
+
+- Analyzing complex design patterns for edge-case coverage
+- Validating deployment and packaging scripts
+- Proofreading technical documentation
 
 The team maintained full control over the codebase, reviewing and adapting all suggestions to meet specific project constraints.
