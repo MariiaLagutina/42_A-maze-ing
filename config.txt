@@ -4,8 +4,8 @@
 
 # Maze dimensions
 # Must be positive integers
-WIDTH = 20
-HEIGHT = 20
+WIDTH = 11
+HEIGHT = 11
 
 # Entry point (x, y)
 # Coordinates are 0-indexed
@@ -14,7 +14,7 @@ ENTRY = 0,0
 
 # Exit point (x, y)
 # Default: (WIDTH - 1, HEIGHT - 1)
-EXIT = 19,19
+EXIT = 10,10
 
 # Maze generation algorithm
 # Options:
@@ -28,7 +28,7 @@ ALGO = backtracker
 PERFECT = true
 
 # Output file name
-OUTPUT_FILE = maze.txt
+OUTPUT_FILE = "maze.txt"
 
 # Random seed (optional)
 # If omitted, randomness is not reproducible

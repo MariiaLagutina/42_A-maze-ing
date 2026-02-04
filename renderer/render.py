@@ -182,23 +182,6 @@ class ASCIIMazeRenderer:
                     path_directions[pos] = self.ARROW_LEFT
                 elif dx > 0:  # Moving right
                     path_directions[pos] = self.ARROW_RIGHT
-
-            # Determine direction and build arrow trail for current position
-            next_pos = path_list[i] if i < len(path_list) else (-1, -1)
-
-            if current_pos and next_pos and next_pos != (-1, -1):
-                dx = next_pos[0] - current_pos[0]
-                dy = next_pos[1] - current_pos[1]
-
-                # Count steps in current direction for trail length
-                trail_length = 1
-                for j in range(i + 1, len(path_list)):
-                    next_dx = path_list[j][0] - path_list[j-1][0]
-                    next_dy = path_list[j][1] - path_list[j-1][1]
-                    if (next_dx, next_dy) == (dx, dy):
-                        trail_length += 1
-                    else:
-                        break
             self.render(
                 walk=walk,
                 visited=visited,
@@ -206,6 +189,5 @@ class ASCIIMazeRenderer:
                 walked_path=current_path,
                 path_directions=path_directions
             )
-
             if i < len(path_list):
                 time.sleep(delay)

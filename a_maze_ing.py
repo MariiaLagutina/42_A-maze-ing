@@ -37,12 +37,16 @@ def main() -> None:
             if "ENTRY" in config
             else (0, 0)
         )
+        if entry < (0, 0) or entry >= (width, height):
+            raise ValueError("ENTRY point is out of maze bounds.")
 
         exit_: tuple[int, int] = (
             parse_point(config["EXIT"])
             if "EXIT" in config
             else (width - 1, height - 1)
         )
+        if exit_ < (0, 0) or exit_ >= (width, height):
+            raise ValueError("EXIT point is out of maze bounds.")
 
     except ValueError as e:
         print(f"Configuration error: {e}")
