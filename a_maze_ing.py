@@ -37,7 +37,8 @@ def main() -> None:
             if "ENTRY" in config
             else (0, 0)
         )
-        if entry < (0, 0) or entry >= (width, height):
+        if (entry[0] < 0 or entry[1] < 0 or
+                entry[0] >= width or entry[1] >= height):
             raise ValueError("ENTRY point is out of maze bounds.")
 
         exit_: tuple[int, int] = (
@@ -45,7 +46,8 @@ def main() -> None:
             if "EXIT" in config
             else (width - 1, height - 1)
         )
-        if exit_ < (0, 0) or exit_ >= (width, height):
+        if (exit_[0] < 0 or exit_[1] < 0 or
+                exit_[0] >= width or exit_[1] >= height):
             raise ValueError("EXIT point is out of maze bounds.")
 
     except ValueError as e:

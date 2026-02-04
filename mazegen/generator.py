@@ -123,6 +123,24 @@ class MazeGenerator(ABC):
             x, y = cx + dx, cy + dy
             if 0 <= x < self.width and 0 <= y < self.height:
                 self.blocked.add((x, y))
+        # Validate that start and end points are not blocked
+        self._validate_start_end_points()
+
+    def _validate_start_end_points(self) -> None:
+        """
+        Validates that start and end points are not blocked cells.
+        Raises ValueError if either is blocked (invalid input).
+        """
+        if self.start in self.blocked:
+            raise ValueError(
+                f"Invalid configuration: Start point {self.start} is blocked. "
+                "Start point cannot be part of the blocked pattern."
+            )
+        if self.end in self.blocked:
+            raise ValueError(
+                f"Invalid configuration: End point {self.end} is blocked. "
+                "End point cannot be part of the blocked pattern."
+            )
 
     def _remove_wall(self, x1: int, y1: int, x2: int, y2: int) -> None:
         """

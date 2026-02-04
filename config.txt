@@ -4,17 +4,17 @@
 
 # Maze dimensions
 # Must be positive integers
-WIDTH = 11
-HEIGHT = 11
+WIDTH = 20
+HEIGHT = 20
 
 # Entry point (x, y)
 # Coordinates are 0-indexed
 # Default: (0, 0)
-ENTRY = 0,0
+ENTRY = 6,8
 
 # Exit point (x, y)
 # Default: (WIDTH - 1, HEIGHT - 1)
-EXIT = 10,10
+EXIT = 0,0
 
 # Maze generation algorithm
 # Options:
