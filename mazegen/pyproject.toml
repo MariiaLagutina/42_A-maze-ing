@@ -19,3 +19,7 @@ dependencies = []
 [tool.setuptools]
 package-dir = {"mazegen" = "."}
 packages = ["mazegen"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+mazegen = ["README.md"]
