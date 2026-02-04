@@ -34,8 +34,7 @@ def main() -> None:
 
         entry: tuple[int, int] = (
             parse_point(config["ENTRY"])
-            if "ENTRY" in config
-            else (0, 0)
+            if "ENTRY" in config else (0, 0)
         )
         if (entry[0] < 0 or entry[1] < 0 or
                 entry[0] >= width or entry[1] >= height):
@@ -43,12 +42,13 @@ def main() -> None:
 
         exit_: tuple[int, int] = (
             parse_point(config["EXIT"])
-            if "EXIT" in config
-            else (width - 1, height - 1)
+            if "EXIT" in config else (width - 1, height - 1)
         )
         if (exit_[0] < 0 or exit_[1] < 0 or
                 exit_[0] >= width or exit_[1] >= height):
             raise ValueError("EXIT point is out of maze bounds.")
+        if entry == exit_:
+            raise ValueError("ENTRY and EXIT points cannot be the same.")
 
     except ValueError as e:
         print(f"Configuration error: {e}")
